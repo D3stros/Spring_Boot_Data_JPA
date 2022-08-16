@@ -1,13 +1,43 @@
 package com.spring.data.jpa;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 public class JpaApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(JpaApplication.class, args);
+	@RestController
+	public class CityController {
+		@Autowired
+		CityRepository cityRepository;
+
+		@GetMapping("/berlin")
+		public City berlin() {
+			return cityRepository.findByName("Berlin");
+		}
+
+		@GetMapping("/duesseldorf")
+		public City duesseldorf() {
+			return cityRepository.findByName("Duesseldorf");
+		}
 	}
 
+	public static void main(String[] args) {
+		ConfigurableApplicationContext applicationContext = SpringApplication.run(JpaApplication.class, args);
+		City berlin = new City();
+		berlin.setName("Berlin");
+		berlin.setCapital(true);
+
+		City duesseldorf = new City();
+		duesseldorf.setCapital(false);
+		duesseldorf.setName("Duesseldorf");
+
+		CityRepository cityRepository = applicationContext.getBean(CityRepository.class);
+		cityRepository.save(berlin);
+		cityRepository.save(duesseldorf);
+	}
 }
